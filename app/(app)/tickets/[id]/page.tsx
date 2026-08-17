@@ -5,12 +5,12 @@ import {
   getTicket,
   getReplies,
   getProfilesByIds,
-  getStaffMembers,
+  getAssignableAdmins,
 } from "@/lib/data/tickets";
-import { isStaff, canReplyInternal } from "@/lib/auth/roles";
+import { isAdmin, canReplyInternal } from "@/lib/auth/roles";
 import { StatusChip, PriorityChip } from "@/components/ui/StatusChip";
 import { ReplyForm } from "@/components/tickets/ReplyForm";
-import { StatusControl, AssignControl } from "@/components/tickets/StaffControls";
+import { StatusControl, AssignControl } from "@/components/tickets/AdminControls";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Ticket · HelpdeskApp" };
@@ -41,11 +41,11 @@ export default async function TicketDetailPage({
   const ticket = await getTicket(ticketId);
   if (!ticket) notFound();
 
-  const staff = isStaff(user.role);
-  const [replies, requesterMap, staffMembers] = await Promise.all([
+  const admin = isAdmin(user.role);
+  const [replies, requesterMap, assignees] = await Promise.all([
     getReplies(ticketId),
     getProfilesByIds([ticket.user_id]),
-    staff ? getStaffMembers() : Promise.resolve([]),
+    admin ? getAssignableAdmins() : Promise.resolve([]),
   ]);
 
   const requester = requesterMap.get(ticket.user_id);
@@ -72,7 +72,7 @@ export default async function TicketDetailPage({
         <p className="whitespace-pre-wrap text-sm text-ink-2">{ticket.body}</p>
       </div>
 
-      {staff && (
+      {admin && (
         <div className="flex flex-wrap gap-4 rounded-[var(--radius-md)] border border-rule bg-paper-2 p-4">
           <div className="w-44">
             <StatusControl ticketId={ticket.id} status={ticket.status} />
@@ -81,7 +81,7 @@ export default async function TicketDetailPage({
             <AssignControl
               ticketId={ticket.id}
               assignedTo={ticket.assigned_to}
-              staff={staffMembers}
+              assignees={assignees}
             />
           </div>
         </div>

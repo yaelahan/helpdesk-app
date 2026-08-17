@@ -27,13 +27,14 @@ const PASSWORD = "demo-password-123";
 
 const USERS = [
   { email: "admin@demo.test", fullName: "Ada Admin", role: "admin" as const },
-  { email: "agent@demo.test", fullName: "Gabe Agent", role: "agent" as const },
   {
     email: "customer@demo.test",
     fullName: "Cara Customer",
     role: "customer" as const,
   },
   {
+    // Second customer purely so cross-tenant isolation is observable: their
+    // ticket must never appear for the first customer.
     email: "customer2@demo.test",
     fullName: "Owen Other",
     role: "customer" as const,
@@ -70,7 +71,7 @@ async function main() {
     ids[u.email] = await upsertUser(u);
 
     // The signup trigger (handle_new_user) always assigns 'customer'.
-    // Promote admin/agent explicitly, replacing the default row so each
+    // Promote admins explicitly, replacing the default row so each
     // seeded account holds exactly one role.
     if (u.role !== "customer") {
       const { error: delErr } = await admin
@@ -90,7 +91,7 @@ async function main() {
 
   console.log("Seeding sample tickets...");
   const customerId = ids["customer@demo.test"];
-  const agentId = ids["agent@demo.test"];
+  const adminId = ids["admin@demo.test"];
   const customer2Id = ids["customer2@demo.test"];
 
   // Idempotent: wipe previously seeded tickets for these demo users before
@@ -105,7 +106,7 @@ async function main() {
     .from("tickets")
     .insert({
       user_id: customerId,
-      assigned_to: agentId,
+      assigned_to: adminId,
       subject: "Can't reset my password",
       body: "I requested a reset link twice but never received the email.",
       status: "pending",
@@ -124,7 +125,7 @@ async function main() {
     },
     {
       ticket_id: t1.id,
-      user_id: agentId,
+      user_id: adminId,
       body: "Checked the mail logs -- SMTP provider flagged the domain, escalating to admin.",
       is_internal: true,
     },

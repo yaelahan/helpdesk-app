@@ -1,4 +1,5 @@
-export type AppRole = "admin" | "agent" | "customer";
+/** Two roles. "customer" is the brief's "user"; see 0007_two_roles.sql. */
+export type AppRole = "admin" | "customer";
 export type TicketStatus = "open" | "pending" | "resolved" | "closed";
 export type TicketPriority = "low" | "normal" | "high" | "urgent";
 

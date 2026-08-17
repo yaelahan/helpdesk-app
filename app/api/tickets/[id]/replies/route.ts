@@ -33,8 +33,8 @@ export async function POST(
     );
   }
 
-  // add_reply() re-derives staff status server-side and forces is_internal
-  // to false for non-staff regardless of what the client sends -- see
+  // add_reply() re-derives admin status server-side and forces is_internal
+  // to false for non-admins regardless of what the client sends -- see
   // supabase/migrations/0004_rpc.sql.
   const { data, error } = await supabase.rpc("add_reply", {
     p_ticket_id: ticketId,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { isStaff } from "@/lib/auth/roles";
+import { isAdmin } from "@/lib/auth/roles";
 import type { SessionUser } from "@/lib/auth/session";
 import {
   DashboardIcon,
@@ -11,7 +11,6 @@ import {
 
 const ROLE_LABEL: Record<NonNullable<SessionUser["role"]>, string> = {
   admin: "Admin",
-  agent: "Agent",
   customer: "Customer",
 };
 
@@ -21,7 +20,7 @@ const ROLE_LABEL: Record<NonNullable<SessionUser["role"]>, string> = {
  * hairline vocabulary instead of being mislabelled as N3.
  */
 export function AppSidebar({ user }: { user: SessionUser }) {
-  const staff = isStaff(user.role);
+  const admin = isAdmin(user.role);
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-rule bg-paper-2 lg:flex">
@@ -39,13 +38,13 @@ export function AppSidebar({ user }: { user: SessionUser }) {
           Dashboard
         </SidebarLink>
         <SidebarLink href="/tickets" icon={<QueueIcon />}>
-          {staff ? "Queue" : "My tickets"}
+          {admin ? "Queue" : "My tickets"}
         </SidebarLink>
         {/* Customers only. create_ticket() stamps user_id = auth.uid(), so a
-            staff member using this form files a ticket against themselves and
+            admin member using this form files a ticket against themselves and
             drops it into the queue they are supposed to be working. Raising a
             ticket for someone else would need a separate requester field. */}
-        {!staff && (
+        {!admin && (
           <SidebarLink href="/tickets/new" icon={<NewTicketIcon />}>
             New ticket
           </SidebarLink>

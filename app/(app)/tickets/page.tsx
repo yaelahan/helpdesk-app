@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getSessionUser } from "@/lib/auth/session";
 import { getTickets, getProfilesByIds } from "@/lib/data/tickets";
-import { isStaff } from "@/lib/auth/roles";
+import { isAdmin } from "@/lib/auth/roles";
 import { StatusChip, PriorityChip } from "@/components/ui/StatusChip";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
@@ -18,20 +18,20 @@ export default async function TicketsPage() {
   const user = await getSessionUser();
   if (!user) return null;
 
-  const staff = isStaff(user.role);
+  const admin = isAdmin(user.role);
   const tickets = await getTickets();
 
-  const requesterIds = staff ? Array.from(new Set(tickets.map((t) => t.user_id))) : [];
-  const requesters = staff ? await getProfilesByIds(requesterIds) : new Map();
+  const requesterIds = admin ? Array.from(new Set(tickets.map((t) => t.user_id))) : [];
+  const requesters = admin ? await getProfilesByIds(requesterIds) : new Map();
 
   return (
     <div className="flex flex-col gap-6">
       {/* S2 hanging: heading floats above with no eyebrow-beside-heading grid (gate 54). */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold text-ink">
-          {staff ? "Queue" : "My tickets"}
+          {admin ? "Queue" : "My tickets"}
         </h1>
-        {!staff && (
+        {!admin && (
           <Link href="/tickets/new">
             <Button>New ticket</Button>
           </Link>
@@ -41,9 +41,9 @@ export default async function TicketsPage() {
       {tickets.length === 0 ? (
         <EmptyState
           title="No tickets"
-          description={staff ? "The queue is empty." : "You haven't opened a ticket yet."}
+          description={admin ? "The queue is empty." : "You haven't opened a ticket yet."}
           action={
-            !staff && (
+            !admin && (
               <Link href="/tickets/new">
                 <Button>New ticket</Button>
               </Link>
@@ -55,7 +55,7 @@ export default async function TicketsPage() {
           <TableHead>
             <tr>
               <TableHeadCell>Subject</TableHeadCell>
-              {staff && <TableHeadCell>Requester</TableHeadCell>}
+              {admin && <TableHeadCell>Requester</TableHeadCell>}
               <TableHeadCell>Priority</TableHeadCell>
               <TableHeadCell>Status</TableHeadCell>
               <TableHeadCell className="text-right">Opened</TableHeadCell>
@@ -72,7 +72,7 @@ export default async function TicketsPage() {
                     {t.subject}
                   </Link>
                 </TableCell>
-                {staff && (
+                {admin && (
                   <TableCell className="text-muted">
                     {requesters.get(t.user_id)?.full_name ?? "—"}
                   </TableCell>

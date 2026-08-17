@@ -74,7 +74,7 @@ export function ReplyForm({ ticketId, canReplyInternal }: { ticketId: number; ca
               onChange={(e) => setIsInternal(e.target.checked)}
               className="size-4 rounded-[4px] border-rule-2 accent-[var(--color-warn)]"
             />
-            Internal note (staff only)
+            Internal note (admins only)
           </label>
         ) : (
           <span />

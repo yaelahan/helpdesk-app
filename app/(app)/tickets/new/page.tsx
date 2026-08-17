@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/session";
-import { isStaff } from "@/lib/auth/roles";
+import { isAdmin } from "@/lib/auth/roles";
 import { getTicketQuota } from "@/lib/data/tickets";
 import { NewTicketForm } from "@/components/tickets/NewTicketForm";
 
@@ -11,10 +11,10 @@ export default async function NewTicketPage() {
   const user = await getSessionUser();
   if (!user) return null;
 
-  // Hiding the nav link is cosmetic; the route has to refuse staff as well.
-  // create_ticket() files against auth.uid(), so a staff-raised ticket would
+  // Hiding the nav link is cosmetic; the route has to refuse admins as well.
+  // create_ticket() files against auth.uid(), so an admin-raised ticket would
   // land in the queue owned by the person meant to be answering it.
-  if (isStaff(user.role)) redirect("/tickets");
+  if (isAdmin(user.role)) redirect("/tickets");
 
   const quota = await getTicketQuota(user.id);
 

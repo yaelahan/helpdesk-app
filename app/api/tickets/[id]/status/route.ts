@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
-import { isStaff } from "@/lib/auth/roles";
+import { isAdmin } from "@/lib/auth/roles";
 import { jsonError, jsonOk } from "@/lib/api";
 import { updateStatusSchema } from "@/lib/validation";
 
@@ -18,8 +18,8 @@ export async function PATCH(
   if (!sessionUser) {
     return jsonError(401, "UNAUTHENTICATED", "Sign in.");
   }
-  if (!isStaff(sessionUser.role)) {
-    return jsonError(403, "FORBIDDEN", "Only staff can change ticket status.");
+  if (!isAdmin(sessionUser.role)) {
+    return jsonError(403, "FORBIDDEN", "Only admins can change ticket status.");
   }
 
   const json = await request.json().catch(() => null);

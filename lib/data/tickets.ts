@@ -4,8 +4,8 @@ import type { Ticket, TicketReply, Profile } from "@/lib/types";
 /**
  * These reads talk to Postgres directly through PostgREST -- no manual
  * `where user_id = ...` filtering here. Row Level Security (see
- * supabase/migrations/0003_rls.sql) already scopes every query to what the
- * caller is allowed to see; a customer's SELECT * from tickets and staff's
+ * supabase/migrations/0007_two_roles.sql) already scopes every query to what the
+ * caller is allowed to see; a customer's SELECT * from tickets and an admin's
  * SELECT * from tickets return different rows from the identical query.
  */
 
@@ -64,17 +64,18 @@ export async function getTicketQuota(userId: string): Promise<{ used: number; li
   return { used: count ?? 0, limit: TICKET_RATE_LIMIT };
 }
 
-export interface StaffMember {
+export interface Assignee {
   user_id: string;
   full_name: string | null;
 }
 
-export async function getStaffMembers(): Promise<StaffMember[]> {
+/** Admins are the only role that can own a ticket, so they're the assignees. */
+export async function getAssignableAdmins(): Promise<Assignee[]> {
   const supabase = await createClient();
   const { data: roles, error } = await supabase
     .from("user_roles")
     .select("user_id, role")
-    .in("role", ["admin", "agent"]);
+    .eq("role", "admin");
   if (error) throw error;
 
   const ids = (roles ?? []).map((r) => r.user_id);

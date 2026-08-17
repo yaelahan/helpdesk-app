@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
-import { isStaff } from "@/lib/auth/roles";
+import { isAdmin } from "@/lib/auth/roles";
 import { jsonError, jsonOk } from "@/lib/api";
 import { assignTicketSchema } from "@/lib/validation";
 
@@ -18,10 +18,10 @@ export async function PATCH(
   if (!sessionUser) {
     return jsonError(401, "UNAUTHENTICATED", "Sign in.");
   }
-  // UI-cosmetic pre-check for a clean 403; RLS (is_staff()) is the real
-  // enforcement -- see supabase/migrations/0003_rls.sql.
-  if (!isStaff(sessionUser.role)) {
-    return jsonError(403, "FORBIDDEN", "Only staff can assign tickets.");
+  // UI-cosmetic pre-check for a clean 403; RLS (is_admin()) is the real
+  // enforcement -- see supabase/migrations/0007_two_roles.sql.
+  if (!isAdmin(sessionUser.role)) {
+    return jsonError(403, "FORBIDDEN", "Only admins can assign tickets.");
   }
 
   const json = await request.json().catch(() => null);

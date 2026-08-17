@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getSessionUser } from "@/lib/auth/session";
 import { getTickets, getTicketQuota } from "@/lib/data/tickets";
-import { isStaff } from "@/lib/auth/roles";
+import { isAdmin } from "@/lib/auth/roles";
 import { StatusChip, PriorityChip } from "@/components/ui/StatusChip";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   if (!user) return null;
 
   const [tickets, quota] = await Promise.all([getTickets(), getTicketQuota(user.id)]);
-  const staff = isStaff(user.role);
+  const admin = isAdmin(user.role);
 
   const counts = STATUS_ORDER.reduce(
     (acc, status) => {
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-8">
       <div>
         <p className="mono-label text-accent">
-          {staff ? "Queue overview" : "Your tickets"}
+          {admin ? "Queue overview" : "Your tickets"}
         </p>
         <h1 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
           Welcome back, {user.fullName?.split(" ")[0] ?? "there"}
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {!staff && (
+      {!admin && (
         <div className="rounded-[var(--radius-md)] border border-rule-2 bg-paper-2 px-4 py-3 text-sm text-ink-2">
           <span className="font-medium text-ink">{quota.used} / {quota.limit}</span>{" "}
           tickets created in the last hour.
@@ -72,10 +72,10 @@ export default async function DashboardPage() {
           <EmptyState
             title="No tickets yet"
             description={
-              staff ? "Nothing in the queue right now." : "Create your first support ticket."
+              admin ? "Nothing in the queue right now." : "Create your first support ticket."
             }
             action={
-              !staff && (
+              !admin && (
                 <Link href="/tickets/new">
                   <Button>New ticket</Button>
                 </Link>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Select } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import type { TicketStatus } from "@/lib/types";
-import type { StaffMember } from "@/lib/data/tickets";
+import type { Assignee } from "@/lib/data/tickets";
 
 const STATUSES: TicketStatus[] = ["open", "pending", "resolved", "closed"];
 
@@ -51,11 +51,11 @@ export function StatusControl({ ticketId, status }: { ticketId: number; status: 
 export function AssignControl({
   ticketId,
   assignedTo,
-  staff,
+  assignees,
 }: {
   ticketId: number;
   assignedTo: string | null;
-  staff: StaffMember[];
+  assignees: Assignee[];
 }) {
   const router = useRouter();
   const { push } = useToast();
@@ -86,7 +86,7 @@ export function AssignControl({
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Unassigned</option>
-        {staff.map((s) => (
+        {assignees.map((s) => (
           <option key={s.user_id} value={s.user_id}>
             {s.full_name ?? s.user_id}
           </option>
