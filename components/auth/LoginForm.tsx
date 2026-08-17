@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { loginSchema } from "@/lib/validation";
 import type { ApiError } from "@/lib/types";
@@ -9,11 +9,14 @@ import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-export function LoginForm() {
+export function LoginForm({
+  next = "/dashboard",
+  linkError = null,
+}: {
+  next?: string;
+  linkError?: string | null;
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/dashboard";
-  const linkError = searchParams.get("error");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
