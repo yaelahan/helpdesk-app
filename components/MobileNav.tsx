@@ -5,19 +5,22 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { DashboardIcon, QueueIcon, NewTicketIcon } from "@/components/ui/icons";
 
-const LINKS = [
-  { href: "/dashboard", label: "Dashboard", Icon: DashboardIcon },
-  { href: "/tickets", label: "Tickets", Icon: QueueIcon },
-  { href: "/tickets/new", label: "New", Icon: NewTicketIcon },
-];
-
 /** Small-viewport nav strip -- the desktop sidebar is hidden below `lg`. */
-export function MobileNav() {
+export function MobileNav({ canCreateTicket }: { canCreateTicket: boolean }) {
   const pathname = usePathname();
+
+  const links = [
+    { href: "/dashboard", label: "Dashboard", Icon: DashboardIcon },
+    { href: "/tickets", label: "Tickets", Icon: QueueIcon },
+    // Customers only -- see the note in AppSidebar.
+    ...(canCreateTicket
+      ? [{ href: "/tickets/new", label: "New", Icon: NewTicketIcon }]
+      : []),
+  ];
 
   return (
     <nav className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper-2 px-3 py-2 lg:hidden">
-      {LINKS.map(({ href, label, Icon }) => {
+      {links.map(({ href, label, Icon }) => {
         const active = pathname === href;
         return (
           <Link

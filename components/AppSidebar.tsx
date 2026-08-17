@@ -41,9 +41,15 @@ export function AppSidebar({ user }: { user: SessionUser }) {
         <SidebarLink href="/tickets" icon={<QueueIcon />}>
           {staff ? "Queue" : "My tickets"}
         </SidebarLink>
-        <SidebarLink href="/tickets/new" icon={<NewTicketIcon />}>
-          New ticket
-        </SidebarLink>
+        {/* Customers only. create_ticket() stamps user_id = auth.uid(), so a
+            staff member using this form files a ticket against themselves and
+            drops it into the queue they are supposed to be working. Raising a
+            ticket for someone else would need a separate requester field. */}
+        {!staff && (
+          <SidebarLink href="/tickets/new" icon={<NewTicketIcon />}>
+            New ticket
+          </SidebarLink>
+        )}
       </nav>
 
       <div className="border-t border-rule p-4">

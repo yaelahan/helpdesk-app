@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/session";
+import { isStaff } from "@/lib/auth/roles";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileNav } from "@/components/MobileNav";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -16,7 +17,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-dvh">
         <AppSidebar user={user} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <MobileNav />
+          <MobileNav canCreateTicket={!isStaff(user.role)} />
           {/* Height is pinned to --nav-height, the same token the sidebar's
               brand block uses, so both bottom hairlines land on the same
               pixel row. */}

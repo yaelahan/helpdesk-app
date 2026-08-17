@@ -31,9 +31,11 @@ export default async function TicketsPage() {
         <h1 className="font-display text-2xl font-semibold text-ink">
           {staff ? "Queue" : "My tickets"}
         </h1>
-        <Link href="/tickets/new">
-          <Button>New ticket</Button>
-        </Link>
+        {!staff && (
+          <Link href="/tickets/new">
+            <Button>New ticket</Button>
+          </Link>
+        )}
       </div>
 
       {tickets.length === 0 ? (
@@ -41,9 +43,11 @@ export default async function TicketsPage() {
           title="No tickets"
           description={staff ? "The queue is empty." : "You haven't opened a ticket yet."}
           action={
-            <Link href="/tickets/new">
-              <Button>New ticket</Button>
-            </Link>
+            !staff && (
+              <Link href="/tickets/new">
+                <Button>New ticket</Button>
+              </Link>
+            )
           }
         />
       ) : (
