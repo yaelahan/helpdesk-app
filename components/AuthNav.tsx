@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
-/** N9 edge-aligned minimal: wordmark hard-left, single CTA hard-right, silence between. */
+/** N9 edge-aligned minimal: wordmark hard-left, actions hard-right. */
 export function AuthNav() {
   const pathname = usePathname();
   const isLogin = pathname === "/login";
@@ -13,12 +14,15 @@ export function AuthNav() {
       <Link href="/" className="font-display text-lg font-semibold text-ink">
         HelpdeskApp
       </Link>
-      <Link
-        href={isLogin ? "/register" : "/login"}
-        className="mono-label rounded-[var(--radius-sm)] border border-rule-2 px-3 py-2 text-ink-2 transition-colors hover:border-accent hover:text-accent"
-      >
-        {isLogin ? "Create account" : "Sign in"}
-      </Link>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <Link
+          href={isLogin ? "/register" : "/login"}
+          className="mono-label rounded-[var(--radius-sm)] border border-rule-2 px-3 py-2 text-ink-2 transition-colors hover:border-accent hover:text-accent"
+        >
+          {isLogin ? "Create account" : "Sign in"}
+        </Link>
+      </div>
     </header>
   );
 }
