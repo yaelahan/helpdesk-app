@@ -8,6 +8,9 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/auth/confirm",
   "/auth/callback",
+  // The sign-in proxy is called by definition without a session; without this
+  // the redirect below would bounce the POST to /login and break login.
+  "/api/auth",
 ];
 
 export async function updateSession(request: NextRequest) {

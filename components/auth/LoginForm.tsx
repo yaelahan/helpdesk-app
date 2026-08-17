@@ -3,8 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { loginSchema } from "@/lib/validation";
+import type { ApiError } from "@/lib/types";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -34,21 +34,35 @@ export function LoginForm() {
     }
 
     setState("loading");
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    // Goes through our own route rather than straight to Supabase, so the
+    // attempt passes a rate limiter we control. See app/api/auth/login.
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+    });
 
-    if (error) {
-      setState("error");
+    if (res.ok) {
+      router.push(next);
+      router.refresh();
+      return;
+    }
+
+    setState("error");
+
+    if (res.status === 429) {
+      const retryAfter = Number(res.headers.get("Retry-After"));
+      const minutes = Number.isFinite(retryAfter) ? Math.ceil(retryAfter / 60) : null;
       setFormError(
-        error.message.toLowerCase().includes("confirm")
-          ? "Confirm your email before signing in -- check the local mail catcher at localhost:54324."
-          : "Incorrect email or password.",
+        minutes
+          ? `Too many sign-in attempts. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`
+          : "Too many sign-in attempts. Try again shortly.",
       );
       return;
     }
 
-    router.push(next);
-    router.refresh();
+    const payload = (await res.json().catch(() => null)) as ApiError | null;
+    setFormError(payload?.error.message ?? "Invalid email or password.");
   }
 
   return (
@@ -107,6 +121,15 @@ export function LoginForm() {
           Create account
         </Link>
       </div>
+
+      {/* Shown always, never conditionally. The sign-in error is deliberately
+          identical for a wrong password, an unknown address, and an
+          unconfirmed one, so this is how a real user learns what to check
+          without the form confirming which emails exist. */}
+      <p className="border-t border-rule pt-4 text-xs text-muted">
+        Just registered? Check your inbox for the confirmation link before
+        signing in.
+      </p>
     </form>
   );
 }

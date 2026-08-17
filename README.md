@@ -39,7 +39,9 @@ Seeded logins (password for all: `demo-password-123`):
 
 ## How it works
 
-**Authentication** is handled by Supabase Auth (GoTrue): `signUp`, `resetPasswordForEmail` → `updateUser`, and cookie-based sessions refreshed in `proxy.ts`. Email links route through `app/auth/confirm/route.ts`, which verifies the OTP server-side so the session cookie is set correctly for SSR. Auth-endpoint rate limits are set explicitly in `supabase/config.toml` under `[auth.rate_limit]`.
+**Authentication** is handled by Supabase Auth (GoTrue): `signUp`, `resetPasswordForEmail` → `updateUser`, and cookie-based sessions refreshed in `proxy.ts`. Email links route through `app/auth/confirm/route.ts`, which verifies the OTP server-side so the session cookie is set correctly for SSR. Passwords are hashed by GoTrue (bcrypt) and never handled by application code.
+
+Sign-in is the one flow that does **not** go straight to Supabase from the browser. It posts to [`app/api/auth/login`](app/api/auth/login/route.ts) instead, because a call the server never sees is a call the server cannot rate limit — see brute-force protection below.
 
 **Authorization** lives in the database:
 
@@ -57,6 +59,21 @@ set role authenticated;
 insert into tickets (user_id, subject, body) values (auth.uid(), 'bypass', 'x');
 -- permission denied for table tickets
 ```
+
+**Brute-force protection** on sign-in uses the same approach — state in Postgres, enforced server-side. [`0006_login_throttle.sql`](supabase/migrations/0006_login_throttle.sql) records every attempt and applies two bounds:
+
+| Bound | Limit | Stops |
+|---|---|---|
+| `(email, ip)` | 5 failures / 5 min | Guessing one account from one host |
+| `ip` | 20 failures / 15 min | Spraying many accounts from one host |
+
+The tight bound is keyed on **email + IP rather than email alone**, which matters: a pure per-email counter is an account-lockout DoS, since anyone could fail five times against a known address and lock the real owner out. Keying on the pair confines the cooldown to the attacker's own host. The residual gap is a distributed attack on a single account, caught only by the looser per-IP bound; the honest answer there is a CAPTCHA or an edge WAF, not a bigger table.
+
+A successful sign-in clears that pair's recent failures, so a few typos don't strand anyone in a cooldown. During a cooldown even the *correct* password is refused — otherwise the limit wouldn't be one.
+
+The rate-limit table has RLS on with **zero policies and no grants** to `anon`/`authenticated`; the two functions are `SECURITY DEFINER` and granted to `service_role` only. If clients could write that table they could poison the counters and lock other people out, which is why the login route uses the service-role key (server-only, never `NEXT_PUBLIC_`). If that key is absent the limiter degrades rather than locking everyone out of the app.
+
+Error responses are deliberately uniform. Wrong password, unknown address, and unconfirmed email all return the same `401 Invalid email or password.`, and password reset returns the same confirmation whether or not the address exists — verified byte-identical. The login form carries a standing "just registered? check your inbox" hint so real users still get unstuck without the form answering an attacker's question.
 
 ## Project structure
 
