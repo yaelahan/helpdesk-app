@@ -1,9 +1,16 @@
 /* Hallmark tokens · theme: Cobalt · genre: modern-minimal
  * Cool engineered paper, one electric-cobalt signal accent, hairline
  * structure, tight 6px/10px radii. See app/globals.css for the stamp.
+ *
+ * Light is the default palette; the dark counterpart lives at the bottom of
+ * this file. Every colour is referenced through a --color-* token, so the two
+ * themes swap by redefining tokens rather than by adding `dark:` variants at
+ * every call site.
  */
 
 :root {
+  color-scheme: light;
+
   /* ---- Color: paper / ink ---- */
   --color-paper:      oklch(98.5% 0.004 250);
   --color-paper-2:    oklch(96.5% 0.006 250);
@@ -21,8 +28,14 @@
   --color-rule-2: oklch(80% 0.01  252);
   --color-rule-on-dark: oklch(38% 0.02 258);
 
-  /* ---- Color: the one signal ---- */
-  --color-accent:      oklch(58% 0.20 256);
+  /* ---- Color: the one signal ----
+     Cobalt's reference accent is oklch(58% 0.20 256), but measured against
+     this paper that yields 4.17:1 as text and 4.24:1 for reversed-out button
+     labels -- both under the WCAG AA 4.5:1 floor for normal-size text, and the
+     accent is used as text (links, eyebrows, the role label). Dropped to 51%
+     lightness, which clears the floor on both sides while still reading as the
+     same electric cobalt. Accessibility outranks the reference value. */
+  --color-accent:      oklch(51% 0.19  256);
   --color-accent-ink:  oklch(99% 0.004 250); /* text on accent fill */
   --color-accent-soft: oklch(94% 0.03  256); /* accent-tinted surface */
 
@@ -83,10 +96,113 @@
   /* ---- Layout ---- */
   --page-max: 76rem;
   --page-gutter: var(--space-md);
-  --nav-height: 60px;
+  /* Single source of truth for the shell's top strip. The sidebar's brand
+     block and the main column's top bar both use it, so their hairlines meet
+     exactly at the sidebar edge instead of missing by a couple of pixels. */
+  --nav-height: 64px;
 
   /* ---- Z-index ---- */
   --z-sticky: 200;
   --z-sticky-nav: 300;
   --z-overlay: 400;
+}
+
+/* ============================================================
+   Dark palette
+   ------------------------------------------------------------
+   Values live here once, under --d-*. The two selectors below map them onto
+   the real --color-* tokens: one for an explicit user choice, one as a no-JS
+   fallback for people whose OS asks for dark. Editing a dark colour means
+   editing exactly one line.
+
+   Cobalt inverts by dropping paper into cool graphite and lifting the accent
+   -- oklch(58% 0.20 256) is a signal on near-white but muddy on a dark
+   ground, so dark mode raises it to 72% lightness. Status hues lift the same
+   way; their -soft surfaces become low-lightness tints rather than washes.
+   ============================================================ */
+
+:root {
+  --d-paper:      oklch(19%   0.015 258);
+  --d-paper-2:    oklch(23%   0.016 258);
+  --d-paper-3:    oklch(27.5% 0.017 258);
+  --d-graphite:   oklch(15%   0.014 260);
+  --d-graphite-2: oklch(21%   0.016 259);
+
+  --d-ink:   oklch(96% 0.006 250);
+  --d-ink-2: oklch(87% 0.008 252);
+  --d-muted: oklch(68% 0.012 254);
+
+  --d-rule:   oklch(32% 0.018 258);
+  --d-rule-2: oklch(42% 0.020 258);
+
+  --d-accent:      oklch(72% 0.16  256);
+  --d-accent-ink:  oklch(17% 0.02  258);
+  --d-accent-soft: oklch(30% 0.065 256);
+
+  --d-warn:         oklch(80% 0.15 65);
+  --d-warn-soft:    oklch(30% 0.06 55);
+  --d-success:      oklch(78% 0.14 158);
+  --d-success-soft: oklch(28% 0.05 158);
+  --d-danger:       oklch(76% 0.15 25);
+  --d-danger-soft:  oklch(30% 0.06 25);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* No-JS / no-preference-stored fallback. Scoped to :not([data-theme]) so an
+     explicit light choice always wins over the OS setting. */
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --color-paper:      var(--d-paper);
+    --color-paper-2:    var(--d-paper-2);
+    --color-paper-3:    var(--d-paper-3);
+    --color-graphite:   var(--d-graphite);
+    --color-graphite-2: var(--d-graphite-2);
+
+    --color-ink:   var(--d-ink);
+    --color-ink-2: var(--d-ink-2);
+    --color-muted: var(--d-muted);
+
+    --color-rule:   var(--d-rule);
+    --color-rule-2: var(--d-rule-2);
+
+    --color-accent:      var(--d-accent);
+    --color-accent-ink:  var(--d-accent-ink);
+    --color-accent-soft: var(--d-accent-soft);
+
+    --color-warn:         var(--d-warn);
+    --color-warn-soft:    var(--d-warn-soft);
+    --color-success:      var(--d-success);
+    --color-success-soft: var(--d-success-soft);
+    --color-danger:       var(--d-danger);
+    --color-danger-soft:  var(--d-danger-soft);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-paper:      var(--d-paper);
+  --color-paper-2:    var(--d-paper-2);
+  --color-paper-3:    var(--d-paper-3);
+  --color-graphite:   var(--d-graphite);
+  --color-graphite-2: var(--d-graphite-2);
+
+  --color-ink:   var(--d-ink);
+  --color-ink-2: var(--d-ink-2);
+  --color-muted: var(--d-muted);
+
+  --color-rule:   var(--d-rule);
+  --color-rule-2: var(--d-rule-2);
+
+  --color-accent:      var(--d-accent);
+  --color-accent-ink:  var(--d-accent-ink);
+  --color-accent-soft: var(--d-accent-soft);
+
+  --color-warn:         var(--d-warn);
+  --color-warn-soft:    var(--d-warn-soft);
+  --color-success:      var(--d-success);
+  --color-success-soft: var(--d-success-soft);
+  --color-danger:       var(--d-danger);
+  --color-danger-soft:  var(--d-danger-soft);
 }
