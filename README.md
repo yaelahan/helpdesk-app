@@ -13,7 +13,11 @@ Stack: Next.js 16 (App Router) + TypeScript, Supabase (Postgres + GoTrue) via `@
 | **Tickets** | Create, list, view, reply; status and priority |
 | **Staff tools** | Assign tickets, change status, post internal notes customers can't see |
 | **Rate limiting** | 10 tickets/hour per user, enforced in the database |
+| **Brute-force** | 5 failed sign-ins / 5 min per account+host, also in the database |
 | **Command palette** | ⌘K / Ctrl+K to jump to a ticket or page |
+| **Light + dark** | Follows the OS by default, toggle overrides and persists |
+
+Both themes are measured, not eyeballed: every text/background pair on the auth screens and the app shell clears WCAG AA (4.5:1 body, 3:1 large) in light and dark. That audit is what caught the accent colour failing at 4.17:1 as link text on light paper — it's now 5.56:1. See the note beside `--color-accent` in [`tokens.css`](tokens.css).
 
 ## Setup
 
