@@ -1,0 +1,92 @@
+/* Hallmark tokens · theme: Cobalt · genre: modern-minimal
+ * Cool engineered paper, one electric-cobalt signal accent, hairline
+ * structure, tight 6px/10px radii. See app/globals.css for the stamp.
+ */
+
+:root {
+  /* ---- Color: paper / ink ---- */
+  --color-paper:      oklch(98.5% 0.004 250);
+  --color-paper-2:    oklch(96.5% 0.006 250);
+  --color-paper-3:    oklch(94%   0.008 250);
+  --color-graphite:   oklch(22%   0.016 260);
+  --color-graphite-2: oklch(28%   0.018 259);
+
+  --color-ink:        oklch(24% 0.02  258);
+  --color-ink-2:      oklch(34% 0.018 257);
+  --color-muted:      oklch(52% 0.014 257);
+  --color-muted-on-dark: oklch(78% 0.012 257);
+
+  /* ---- Color: rules (hairlines do the structural work here) ---- */
+  --color-rule:   oklch(88% 0.008 250);
+  --color-rule-2: oklch(80% 0.01  252);
+  --color-rule-on-dark: oklch(38% 0.02 258);
+
+  /* ---- Color: the one signal ---- */
+  --color-accent:      oklch(58% 0.20 256);
+  --color-accent-ink:  oklch(99% 0.004 250); /* text on accent fill */
+  --color-accent-soft: oklch(94% 0.03  256); /* accent-tinted surface */
+
+  /* ---- Color: status (never a hue rainbow -- weight + ink, not color) ---- */
+  --color-warn:      oklch(55% 0.19 30);   /* urgent priority only */
+  --color-warn-soft: oklch(95% 0.03 30);
+  --color-success:      oklch(52% 0.13 155);
+  --color-success-soft: oklch(94% 0.04 155);
+  --color-danger:      oklch(55% 0.20 25);
+  --color-danger-soft: oklch(95% 0.04 25);
+
+  --color-focus: var(--color-accent);
+
+  /* ---- Type ---- */
+  --font-display: var(--font-display), "Space Grotesk", ui-sans-serif, sans-serif;
+  --font-body:    var(--font-body), "Inter", ui-sans-serif, sans-serif;
+  --font-mono:    var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.8125rem;
+  --text-md:   0.9375rem;
+  --text-lg:   1.0625rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.625rem;
+  --text-3xl:  clamp(1.875rem, 1.6rem + 1.2vw, 2.5rem);
+  --text-display:   clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+  --text-display-s: clamp(1.875rem, 1.6rem + 1.4vw, 2.75rem);
+
+  --lh-tight: 1.08;
+  --lh-normal: 1.5;
+  --tracking-tight: -0.02em;
+  --tracking-mono: 0.06em;
+
+  /* ---- Space (4pt scale) ---- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs:  0.75rem;
+  --space-sm:  1rem;
+  --space-md:  1.5rem;
+  --space-lg:  2rem;
+  --space-xl:  3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* ---- Radii (ruler-drawn, not soft pills) ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* ---- Motion ---- */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+
+  /* ---- Layout ---- */
+  --page-max: 76rem;
+  --page-gutter: var(--space-md);
+  --nav-height: 60px;
+
+  /* ---- Z-index ---- */
+  --z-sticky: 200;
+  --z-sticky-nav: 300;
+  --z-overlay: 400;
+}
