@@ -35,6 +35,11 @@ yarn-error.log*
 # ...but the no-secrets template belongs in the repo
 !.env.example
 
+# local scratch notes -- may hold credentials, never commit
+note.txt
+notes.txt
+*.local.md
+
 # vercel
 .vercel
 
